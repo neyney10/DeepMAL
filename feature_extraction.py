@@ -3,7 +3,7 @@ from feature_extraction.n_bytes_per_packet import NBytesPerPacket
 from nfstream import NFStreamer  # https://www.nfstream.org/docs/api
 
 
-input_pcap_filepath = 'data/DoH-Firefox84-Cloudflare-1.pcap'
+input_pcap_filepath = 'data/DoH-Firefox85-Quad9-1.pcap'
 plugins = [
     NBytesPerPacket(),
 ]
@@ -23,5 +23,5 @@ my_streamer = NFStreamer(source=input_pcap_filepath,
                                 n_meters=0,
                                 performance_report=0)
 
-my_streamer.to_csv('output.csv')
+my_streamer.to_csv('output-quad9.csv')
 print('Exiting...')

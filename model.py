@@ -6,12 +6,6 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
 import tensorflow.keras as K
 
-def recall_m(y_true, y_pred):
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-    recall = true_positives / (possible_positives + K.epsilon())
-    return recall
-
 def stack(layers):
     '''
     Using the Functional-API of Tensorflow to build a sequential
@@ -29,7 +23,7 @@ class DeepMALRawPackets:
     def __init__(self, input_size=1024) -> None:
         input_layer = Input(shape=(input_size,1))
         self.model = Model(
-            name='DeepMAL',
+            name='DeepMAL-Packets',
             inputs=input_layer,
             outputs=stack([
                 input_layer,
@@ -40,7 +34,7 @@ class DeepMALRawPackets:
                 Flatten(),
                 Dense(200),
                 Dense(200),
-                Dense(1, activation='softmax')
+                Dense(1, activation='sigmoid')
             ])
         )
         
@@ -49,16 +43,19 @@ class DeepMALRawPackets:
         self.model.compile(
             optimizer='adam',
             loss=loss_fn,
-            metrics=[tf.keras.metrics.Accuracy(),
-                     tf.keras.metrics.Recall(),
-                     tf.keras.metrics.Precision()]
+            metrics=[
+                tf.keras.metrics.BinaryAccuracy(threshold=0.51),
+                #tf.keras.metrics.Accuracy(),
+                tf.keras.metrics.Recall(thresholds=0.51),
+                tf.keras.metrics.Precision(thresholds=0.51)
+            ]
         )
     
 class DeepMALRawFlows:
     def __init__(self, input_size=100) -> None:
         input_layer = Input(shape=(input_size, 1, 2))
         self.model = Model(
-            name='DeepMAL',
+            name='DeepMAL[-Flows',
             inputs=input_layer,
             outputs=stack([
                 input_layer,
@@ -66,7 +63,7 @@ class DeepMALRawFlows:
                 Flatten(),
                 Dense(50),
                 Dense(100),
-                Dense(1)
+                Dense(1, activation='sigmoid')
             ])
         )
         
